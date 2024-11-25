@@ -5,21 +5,42 @@
 
 using namespace std;
 
-const int MAX_CIDADES = 100; // Define o tamanho m·ximo de cidades no grafo
-const int INF = INT_MAX;     // Conex„o inexistente ou caminho impossÌvel de alcanÁar no grafo
+const int MAX_CIDADES = 100; // Define o tamanho m√°ximo de cidades no grafo
+const int INF = INT_MAX;     // Conex√£o inexistente ou caminho imposs√≠vel de alcan√ßar no grafo
 
 // Armazenar dados de cada cidade
 struct Cidade
 {
     char nome[30];
     bool possuiCentroPokemon;
-    int conexoes[MAX_CIDADES]; // Armazena as dist‚ncias para outras cidades
+    int conexoes[MAX_CIDADES]; // Armazena as distÔøΩncias para outras cidades
 };
 
 Cidade cidades[MAX_CIDADES]; // Array de cidades
 int numCidades = 0;
 
-// Inicializa as conexıes entre as cidades com valor infinito
+struct Pokemon
+{
+    string nome;
+    string tipo;
+    int numero;
+    int x, y;
+
+    Pokemon() {}
+    Pokemon(string n, string t, int num, int px, int py)
+        : nome(n), tipo(t), numero(num), x(px), y(py) {}
+};
+
+struct Node
+{
+    Pokemon pokemon;
+    Node *esquerda;
+    Node *direita;
+
+    Node(Pokemon p) : pokemon(p), esquerda(NULL), direita(NULL) {}
+};
+
+// Inicializa as conexÔøΩes entre as cidades com valor infinito
 void inicializarGrafo()
 {
     for (int i = 0; i < MAX_CIDADES; ++i)
@@ -31,38 +52,38 @@ void inicializarGrafo()
     }
 }
 
-// Adiciona cidade e seus vizinhos com as suas dist‚ncias
+// Adiciona cidade e seus vizinhos com as suas distÔøΩncias
 void adicionarCidade(int codigo, const char *nome, bool centroPokemon, int vizinhos[], int distancias[], int numVizinhos)
 {
     if (codigo >= MAX_CIDADES)
     {
-        cout << "CÛdigo de cidade excede o m·ximo permitido.\n";
+        cout << "CÔøΩdigo de cidade excede o mÔøΩximo permitido.\n";
         return;
     }
     strcpy(cidades[codigo].nome, nome);
     cidades[codigo].possuiCentroPokemon = centroPokemon;
 
-    // Define as conexıes no grafo com as dist‚ncias fornecidas
+    // Define as conexÔøΩes no grafo com as distÔøΩncias fornecidas
     for (int i = 0; i < numVizinhos; ++i)
     {
         int vizinho = vizinhos[i];
         int distancia = distancias[i];
         if (vizinho < MAX_CIDADES)
         {
-            cidades[codigo].conexoes[vizinho] = distancia; // Define a dist‚ncia
-            cidades[vizinho].conexoes[codigo] = distancia; // Grafo n„o direcionado
+            cidades[codigo].conexoes[vizinho] = distancia; // Define a distÔøΩncia
+            cidades[vizinho].conexoes[codigo] = distancia; // Grafo nÔøΩo direcionado
         }
     }
     numCidades = max(numCidades, codigo + 1);
 }
-// Usa Dijkstra para encontrar a rota mais prÛxima atÈ um centro PokÈmon
+// Usa Dijkstra para encontrar a rota mais prÔøΩxima atÔøΩ um centro PokÔøΩmon
 void encontrarCentroPokemonMaisProximo(int cidadeAtual)
 {
     int dist[MAX_CIDADES];
     bool visitado[MAX_CIDADES];
     int predecessores[MAX_CIDADES];
 
-    // Inicializa as dist‚ncias e o array de visitados
+    // Inicializa as distÔøΩncias e o array de visitados
     for (int i = 0; i < MAX_CIDADES; ++i)
     {
         dist[i] = INF;
@@ -73,7 +94,7 @@ void encontrarCentroPokemonMaisProximo(int cidadeAtual)
 
     for (int i = 0; i < numCidades; ++i)
     {
-        // Encontra o vÈrtice com a menor dist‚ncia que ainda n„o foi visitado
+        // Encontra o vÔøΩrtice com a menor distÔøΩncia que ainda nÔøΩo foi visitado
         int minDist = INF, u = -1;
         for (int j = 0; j < numCidades; ++j)
         {
@@ -85,10 +106,10 @@ void encontrarCentroPokemonMaisProximo(int cidadeAtual)
         }
 
         if (u == -1)
-            break; // N„o h· mais vÈrtices a serem visitados
+            break; // NÔøΩo hÔøΩ mais vÔøΩrtices a serem visitados
         visitado[u] = true;
 
-        // Atualiza as dist‚ncias para os vizinhos de 'u'
+        // Atualiza as distÔøΩncias para os vizinhos de 'u'
         for (int v = 0; v < numCidades; ++v)
         {
             if (!visitado[v] && cidades[u].conexoes[v] != INF && dist[u] + cidades[u].conexoes[v] < dist[v])
@@ -99,7 +120,7 @@ void encontrarCentroPokemonMaisProximo(int cidadeAtual)
         }
     }
 
-    // Encontra o centro PokÈmon mais prÛximo
+    // Encontra o centro PokÔøΩmon mais prÔøΩximo
     int centroMaisProximo = -1;
     int menorDistancia = INF;
     for (int i = 0; i < numCidades; ++i)
@@ -113,12 +134,12 @@ void encontrarCentroPokemonMaisProximo(int cidadeAtual)
 
     if (centroMaisProximo == -1)
     {
-        cout << "Nenhum centro PokÈmon acessÌvel a partir da cidade atual.\n";
+        cout << "Nenhum centro PokÔøΩmon acessÔøΩvel a partir da cidade atual.\n";
         return;
     }
 
-    // Exibe a rota atÈ o centro PokÈmon mais prÛximo
-    cout << "Rota para o centro PokÈmon mais prÛximo (" << cidades[centroMaisProximo].nome << "):\n";
+    // Exibe a rota atÔøΩ o centro PokÔøΩmon mais prÔøΩximo
+    cout << "Rota para o centro PokÔøΩmon mais prÔøΩximo (" << cidades[centroMaisProximo].nome << "):\n";
     int caminho[MAX_CIDADES];
     int tamanhoCaminho = 0;
     for (int v = centroMaisProximo; v != -1; v = predecessores[v])
@@ -133,74 +154,289 @@ void encontrarCentroPokemonMaisProximo(int cidadeAtual)
         if (i > 0)
             cout << " -> ";
     }
-    cout << "\nDist‚ncia total: " << menorDistancia << "\n";
+    cout << "\nDistÔøΩncia total: " << menorDistancia << "\n";
+}
+
+// Fun√ß√£o para inserir um novo Pok√©mon na √°rvore bin√°ria
+Node *inserir(Node *raiz, Pokemon p)
+{
+    if (raiz == NULL)
+    {
+        return new Node(p);
+    }
+    if (p.nome < raiz->pokemon.nome)
+    {
+        raiz->esquerda = inserir(raiz->esquerda, p);
+    }
+    else if (p.nome > raiz->pokemon.nome)
+    {
+        raiz->direita = inserir(raiz->direita, p);
+    }
+    return raiz;
+}
+
+// Fun√ß√£o para buscar um Pok√©mon pelo nome na √°rvore bin√°ria
+bool buscar(Node *raiz, string nome)
+{
+    if (raiz == NULL)
+    {
+        return false;
+    }
+    if (raiz->pokemon.nome == nome)
+    {
+        return true;
+    }
+    if (nome < raiz->pokemon.nome)
+    {
+        return buscar(raiz->esquerda, nome);
+    }
+    else
+    {
+        return buscar(raiz->direita, nome);
+    }
+}
+
+// Fun√ß√£o para imprimir as informa√ß√µes dos Pok√©mons em ordem crescente dos nomes
+void imprimirEmOrdem(Node *raiz)
+{
+    if (raiz != NULL)
+    {
+        imprimirEmOrdem(raiz->esquerda);
+        cout << "Nome: " << raiz->pokemon.nome
+             << " - Tipo: " << raiz->pokemon.tipo
+             << " - Numero: " << raiz->pokemon.numero
+             << " - Localizacao: (" << raiz->pokemon.x << ", " << raiz->pokemon.y << ")\n";
+        imprimirEmOrdem(raiz->direita);
+    }
+}
+
+// Fun√ß√£o para coletar Pok√©mons em um array
+void coletarPokemons(Node *raiz, Pokemon pokemons[], int &index)
+{
+    if (raiz != NULL)
+    {
+        coletarPokemons(raiz->esquerda, pokemons, index);
+        pokemons[index++] = raiz->pokemon;
+        coletarPokemons(raiz->direita, pokemons, index);
+    }
+}
+
+// Fun√ß√£o para ordenar os Pok√©mons por tipo (usando bubble sort)
+void ordenarPorTipo(Pokemon pokemons[], int n)
+{
+    for (int i = 0; i < n - 1; ++i)
+    {
+        for (int j = 0; j < n - i - 1; ++j)
+        {
+            if (pokemons[j].tipo > pokemons[j + 1].tipo)
+            {
+                Pokemon temp = pokemons[j];
+                pokemons[j] = pokemons[j + 1];
+                pokemons[j + 1] = temp;
+            }
+        }
+    }
+}
+
+// Fun√ß√£o para imprimir os Pok√©mons por tipo
+void imprimirPorTipo(Node *raiz)
+{
+    if (raiz == NULL)
+        return;
+
+    const int MAX_POKEMONS = 100; // Define a capacidade m√°xima para simplifica√ß√£o
+    Pokemon pokemons[MAX_POKEMONS];
+    int index = 0;
+
+    coletarPokemons(raiz, pokemons, index);
+    ordenarPorTipo(pokemons, index);
+
+    for (int i = 0; i < index; ++i)
+    {
+        cout << "Nome: " << pokemons[i].nome
+             << " - Tipo: " << pokemons[i].tipo
+             << " - Numero: " << pokemons[i].numero
+             << " - Localizacao: (" << pokemons[i].x << ", " << pokemons[i].y << ")\n";
+    }
+}
+
+// Fun√ß√£o para contar quantos Pok√©mons t√™m determinado tipo
+int contarPorTipo(Node *raiz, string tipo)
+{
+    if (raiz == NULL)
+    {
+        return 0;
+    }
+    int count = 0;
+    if (raiz->pokemon.tipo == tipo)
+    {
+        count = 1;
+    }
+    return count + contarPorTipo(raiz->esquerda, tipo) + contarPorTipo(raiz->direita, tipo);
+}
+
+// Fun√ß√£o para desalocar a mem√≥ria da √°rvore bin√°ria
+void destruirArvore(Node *raiz)
+{
+    if (raiz != NULL)
+    {
+        destruirArvore(raiz->esquerda);
+        destruirArvore(raiz->direita);
+        delete raiz;
+    }
 }
 
 int main()
 {
     setlocale(LC_ALL, "pt_BR.UTF-8");
+    Node *raiz = NULL;
+    int opcao = -1;
 
     // Inicializa o grafo
     inicializarGrafo();
 
-    int op;
-    cout << "---------------POK…DEX----------------" << endl;
-    do
+    while (true)
     {
-        cout << "Digite 1 para adicionar uma cidade e 2 para encontrar um caminho | 0 para encerrar" << endl;
-        cin >> op;
-        switch (op)
+        cout << "---------------Bem-vindo, treinador!------------------" << endl;
+        cout << "Digite 1 para opera√ß√µes com cidades | 2 para opera√ß√µes com Pok√©mons | 0 para sair" << endl; 
+        cin >> opcao;
+        if (opcao == 1)
         {
-        case 1:
-        {
-            cout << "Quantas cidades deseja adicionar? ";
-            int num;
-            cin >> num;
-
-            for (int i = 0; i < num; ++i)
+            int op;
+            cout << "---------------MAPA----------------" << endl;
+            do
             {
-                int codigo;
-                char nome[30];
-                bool centroPokemon;
-                int numVizinhos;
 
-                cout << "\nDigite o cÛdigo da cidade: ";
-                cin >> codigo;
-                cin.ignore();
-                cout << "Digite o nome da cidade: ";
-                cin.getline(nome, 30);
-                cout << "A cidade possui centro PokÈmon? (Digite 1 para SIM ou Digite 0 para N√O): ";
-                cin >> centroPokemon;
-
-                cout << "Quantas cidades vizinhas? ";
-                cin >> numVizinhos;
-                int vizinhos[MAX_CIDADES];
-                int distancias[MAX_CIDADES];
-                cout << endl;
-
-                cout << "Digite os cÛdigos das cidades vizinhas e as dist‚ncias:\n";
-                for (int j = 0; j < numVizinhos; ++j)
+                cout << "Digite 1 para adicionar uma cidade e 2 para encontrar um caminho | 0 para encerrar" << endl;
+                cin >> op;
+                switch (op)
                 {
-                    cout << "CÛdigo da cidade vizinha: ";
-                    cin >> vizinhos[j];
-                    cout << "Dist‚ncia atÈ essa cidade: ";
-                    cin >> distancias[j];
+                case 1:
+                {
+                    cout << "Quantas cidades deseja adicionar? ";
+                    int num;
+                    cin >> num;
+
+                    for (int i = 0; i < num; ++i)
+                    {
+                        int codigo;
+                        char nome[30];
+                        bool centroPokemon;
+                        int numVizinhos;
+
+                        cout << "\nDigite o cÔøΩdigo da cidade: ";
+                        cin >> codigo;
+                        cin.ignore();
+                        cout << "Digite o nome da cidade: ";
+                        cin.getline(nome, 30);
+                        cout << "A cidade possui centro PokÔøΩmon? (Digite 1 para SIM ou Digite 0 para NÔøΩO): ";
+                        cin >> centroPokemon;
+
+                        cout << "Quantas cidades vizinhas? ";
+                        cin >> numVizinhos;
+                        int vizinhos[MAX_CIDADES];
+                        int distancias[MAX_CIDADES];
+                        cout << endl;
+
+                        cout << "Digite os cÔøΩdigos das cidades vizinhas e as distÔøΩncias:\n";
+                        for (int j = 0; j < numVizinhos; ++j)
+                        {
+                            cout << "CÔøΩdigo da cidade vizinha: ";
+                            cin >> vizinhos[j];
+                            cout << "DistÔøΩncia atÔøΩ essa cidade: ";
+                            cin >> distancias[j];
+                        }
+
+                        adicionarCidade(codigo, nome, centroPokemon, vizinhos, distancias, numVizinhos);
+                    }
+                    break;
+                }
+                case 2:
+                {
+                    cout << "\nDigite o cÔøΩdigo da cidade atual para buscar o centro PokÔøΩmon mais prÔøΩximo: ";
+                    int cidadeAtual;
+                    cin >> cidadeAtual;
+
+                    encontrarCentroPokemonMaisProximo(cidadeAtual);
+                }
+                }
+            } while (op != 0);
+        }
+
+        else if (opcao == 2)
+        {
+            int op;
+            cout << "---------------POK√âDEX----------------" << endl;
+            while (true)
+            {
+                cout << "1. Inserir Pokemon\n2. Imprimir Pokemons em ordem alfabetica\n3. Verificar Pokemon por nome\n4. Imprimir Pokemons por tipo\n5. Contar Pokemons por tipo\n0. Sair\n";
+                cin >> op;
+
+                if (op == 0)
+                {
+                    break;
                 }
 
-                adicionarCidade(codigo, nome, centroPokemon, vizinhos, distancias, numVizinhos);
+                if (op == 1)
+                {
+                    string nome, tipo;
+                    int numero, x, y;
+                    cout << "Nome: ";
+                    cin >> nome;
+                    cout << "Tipo: ";
+                    cin >> tipo;
+                    cout << "Numero: ";
+                    cin >> numero;
+                    cout << "Localizacao (x y): ";
+                    cin >> x >> y;
+
+                    Pokemon p(nome, tipo, numero, x, y);
+                    raiz = inserir(raiz, p);
+                }
+                else if (op == 2)
+                {
+                    imprimirEmOrdem(raiz);
+                }
+                else if (op == 3)
+                {
+                    string nome;
+                    cout << "Nome do Pokemon: ";
+                    cin >> nome;
+
+                    if (buscar(raiz, nome))
+                    {
+                        cout << "Pokemon encontrado!\n";
+                    }
+                    else
+                    {
+                        cout << "Pokemon nao encontrado!\n";
+                    }
+                }
+                else if (op == 4)
+                {
+                    imprimirPorTipo(raiz);
+                }
+                else if (op == 5)
+                {
+                    string tipo;
+                    cout << "Tipo do Pokemon: ";
+                    cin >> tipo;
+                    int count = contarPorTipo(raiz, tipo);
+                    cout << "Numero de Pokemons do tipo " << tipo << ": " << count << "\n";
+                }
+                else
+                {
+                    cout << "Op√ß√£o inv√°lida!\n";
+                }
             }
+        }
+        else
+        {
             break;
         }
-        case 2:
-        {
-            cout << "\nDigite o cÛdigo da cidade atual para buscar o centro PokÈmon mais prÛximo: ";
-            int cidadeAtual;
-            cin >> cidadeAtual;
+    }
 
-            encontrarCentroPokemonMaisProximo(cidadeAtual);
-        }
-        }
-    } while (op != 0);
+    destruirArvore(raiz);
 
     return 0;
 }
