@@ -208,26 +208,20 @@ Node *inserirPokemon(Node *raiz, Pokemon p)
         raiz->direita = inserirPokemon(raiz->direita, p);
     }
 
-    // Calcula o fator de balanceamento
     int fb = fatorBalanceamento(raiz);
 
-    // Corrige desbalanceamentos
-    // Caso Esquerda-Esquerda
     if (fb > 1 && p.nome < raiz->esquerda->pokemon.nome)
         return rotacaoDireita(raiz);
 
-    // Caso Direita-Direita
     if (fb < -1 && p.nome > raiz->direita->pokemon.nome)
         return rotacaoEsquerda(raiz);
 
-    // Caso Esquerda-Direita
     if (fb > 1 && p.nome > raiz->esquerda->pokemon.nome)
     {
         raiz->esquerda = rotacaoEsquerda(raiz->esquerda);
         return rotacaoDireita(raiz);
     }
 
-    // Caso Direita-Esquerda
     if (fb < -1 && p.nome < raiz->direita->pokemon.nome)
     {
         raiz->direita = rotacaoDireita(raiz->direita);
