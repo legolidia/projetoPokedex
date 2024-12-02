@@ -58,7 +58,7 @@ void adicionarCidade(int codigo, const char *nome, bool centroPokemon, int vizin
 void encontrarCentroPokemonMaisProximo(int cidadeAtual)
 {
     int dist[MAX_CIDADES]; //menor distância da cidade atual para cada cidade.
-    bool visitado[MAX_CIDADES]; //indica se a cidade já foi visitada.
+    bool visitado[MAX_CIDADES]; //indica se a cidade já foi visitada. Processada apenas uma vez. 
     int predecessores[MAX_CIDADES];// armazena o caminho de cada cidade.
 
     for (int i = 0; i < MAX_CIDADES; ++i)
@@ -105,7 +105,8 @@ void encontrarCentroPokemonMaisProximo(int cidadeAtual)
             menorDistancia = dist[i];
             centroMaisProximo = i; //Define centroMaisProximo como o índice dessa cidade.
         }
-    }
+    } //Após calcular as menores distâncias, identifica o centro Pokémon mais próximo, 
+    //verificando o menor valor em dist entre cidades que possuem centro Pokémon.
 
     if (centroMaisProximo == -1)
     {
